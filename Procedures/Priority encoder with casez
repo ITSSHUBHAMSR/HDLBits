@@ -1,0 +1,19 @@
+module top_module (
+    input [7:0] in,
+    output reg [2:0] pos );
+   
+    always@(in)begin
+        casez(in)
+            8'bzzzz_zzz1 : pos='d0;
+            8'bzzzz_zz10 : pos='d1;
+            8'bzzzz_z100 : pos='d2;
+            8'bzzzz_1000 : pos='d3;
+            8'bzzz1_0000 : pos='d4;
+            8'bzz10_0000 : pos='d5;
+            8'bz100_0000 : pos='d6;
+            8'b1000_0000 : pos='d7;
+            default : pos='d0;
+        endcase
+    end
+    
+endmodule
