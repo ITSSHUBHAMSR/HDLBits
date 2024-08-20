@@ -1,0 +1,15 @@
+module top_module (
+    input [3:0] in,
+    output reg [1:0] pos  );
+    
+    always@(in)begin
+        casex(in)
+            4'bxxx1 : pos='d0;
+            4'bxx10 : pos='d1;
+            4'bx100 : pos='d2;
+            4'b1000 : pos='d3;
+            default : pos='d0;
+        endcase
+    end
+
+endmodule
