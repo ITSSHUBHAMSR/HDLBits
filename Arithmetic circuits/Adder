@@ -1,0 +1,22 @@
+module top_module (
+    input [3:0] x,
+    input [3:0] y, 
+    output [4:0] sum);
+    
+    wire [2:0]c;
+    
+    FA U0(x[0],y[0],1'b0,sum[0],c[0]);
+    FA U1(x[1],y[1],c[0],sum[1],c[1]);
+    FA U2(x[2],y[2],c[1],sum[2],c[2]);
+    FA U3(x[3],y[3],c[2],sum[3],sum[4]);
+
+endmodule
+
+module FA(
+    input a,b,cin,
+    output sum,cout);
+    
+    assign sum=a^b^cin;
+    assign cout=(a^b)&cin | (a&b);
+    
+endmodule
