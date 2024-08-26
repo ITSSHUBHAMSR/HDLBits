@@ -1,0 +1,26 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] pedge
+);
+    reg [7:0]in_reg;
+    
+    always@(posedge clk)begin
+        pedge='d0;
+        for(integer i=0;i<8;i=i+1)begin
+            if((in[i]) & (~in_reg[i]))
+                pedge[i]=1;
+            else 
+                pedge[i]=pedge[i];
+        end
+        in_reg=in;
+    end
+    
+    /*
+    always @(posedge clk) begin
+		d_last <= in;			// Remember the state of the previous cycle
+		pedge <= in & ~d_last;	// A positive edge occurred if input was 0 and is now 1.
+	end
+    */
+
+endmodule
