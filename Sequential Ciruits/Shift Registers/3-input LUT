@@ -1,0 +1,35 @@
+module top_module (
+    input clk,
+    input enable,
+    input S,
+    input A, B, C,
+    output Z ); 
+    
+    reg [7:0]Q;
+    
+    always@(posedge clk)begin
+        if(enable)
+            Q<={Q[6:0],S};
+        else
+            Q<=Q;
+    end
+    /*
+    always@(*)begin
+        case({A,B,C})
+            'd0 : Z=Q[0];
+            'd1 : Z=Q[1];
+            'd2 : Z=Q[2];
+            'd3 : Z=Q[3];
+            'd4 : Z=Q[4];
+            'd5 : Z=Q[5];
+            'd6 : Z=Q[6];
+            'd7 : Z=Q[7];
+            default : Z=Z;
+        endcase
+    end
+    */
+    
+    assign Z=Q[{A,B,C}];
+            
+
+endmodule
