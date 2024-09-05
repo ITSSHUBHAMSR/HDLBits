@@ -1,0 +1,52 @@
+module top_module (
+    input clk,
+    input reset,
+    input [3:1] s,
+    output fr3,
+    output fr2,
+    output fr1,
+    output dfr
+); 
+    
+    parameter A=0,B=1,C=2,D=3;
+    reg [1:0] state,next_state;
+    reg [1:0] prev_state;
+    
+    always@(*)begin
+         state=next_state;
+    end
+    
+    always@(posedge clk)begin
+        if(reset)
+            next_state<=A;
+        else
+            case(state)
+                A : next_state <= s[1]?B:A;
+                    
+                B : next_state <= s[2]?C:(s[1]?B:A);
+                    
+                C : next_state <= s[3]?D:(s[2]?C:B);
+     
+                D : next_state <= s[3]?D:C;
+            endcase
+        prev_state=next_state;
+    end
+                    
+    always@(*)begin
+            case(state)
+                A : {fr1,fr2,fr3,dfr} <= 4'b1111;
+                B : begin
+                    if(prev_state==C) {fr1,fr2,fr3,dfr} <= 4'b1101;
+                    else if(prev_state==B) {fr1,fr2,fr3,dfr} <= {fr1,fr2,fr3,dfr};
+                    else {fr1,fr2,fr3,dfr} = 4'b1100;
+                    end
+                C : begin
+                    if(prev_state==D) {fr1,fr2,fr3,dfr} <= 4'b1001;
+                    else if(prev_state==C) {fr1,fr2,fr3,dfr} <= {fr1,fr2,fr3,dfr};
+                    else {fr1,fr2,fr3,dfr} <= 4'b1000;
+                    end
+                D : {fr1,fr2,fr3,dfr} <= 4'b0000;
+            endcase
+    end
+            
+endmodule
