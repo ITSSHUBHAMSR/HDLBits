@@ -1,0 +1,26 @@
+module top_module(
+    input clk,
+    input reset,    // Synchronous reset to OFF
+    input j,
+    input k,
+    output out); //  
+
+    parameter OFF=0, ON=1; 
+    reg next_state;
+
+    always @(posedge clk) begin
+        // State flip-flops with synchronous reset
+        if(reset)
+            next_state=OFF;
+        else
+            case(next_state)
+                OFF : next_state=j?ON:OFF;
+                ON  : next_state=k?OFF:ON;
+                default : next_state=OFF;
+            endcase
+    end
+
+    // Output logic
+    assign out = (next_state == ON);
+
+endmodule
