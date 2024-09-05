@@ -5,7 +5,7 @@ module top_module(
     output out); 
     
     parameter A=0, B=1, C=2, D=3;
-    reg [1:0] state, next_state;
+    reg [1:0] state;
 
     always@(posedge clk or posedge areset)begin
         if(areset) 
