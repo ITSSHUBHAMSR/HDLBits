@@ -1,0 +1,56 @@
+module top_module(
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    input dig,
+    output walk_left,
+    output walk_right,
+    output aaah,
+    output digging ); 
+    
+    parameter LEFT=0, RIGHT=1,GROUND=2,DIG=3,SPLATTER=4;
+    reg [2:0] state, next_state;
+    reg [1:0] count;
+    reg [8:0] counter;
+
+    always @(*) begin
+        // State transition logic
+        if(areset)
+            state=LEFT;
+        else
+            state=next_state;
+    end
+
+    always @(posedge clk, posedge areset) begin
+        // State flip-flops with asynchronous reset
+        if(areset) begin
+            next_state = LEFT;
+            counter = 'd0;
+        end
+        else
+            case(state)
+                LEFT : begin next_state=ground?(dig?DIG:(bump_left)?RIGHT:LEFT):GROUND; count=1; counter = 'd0; end
+                RIGHT : begin next_state=ground?(dig?DIG:(bump_right)?LEFT:RIGHT):GROUND; count=2; counter = 'd0; end
+                GROUND : begin
+                         counter=counter+1;
+                    if((ground) && (counter>=21))
+                        next_state=SPLATTER;
+                    else 
+                         next_state = (ground)?(count==1?LEFT:RIGHT):(GROUND);
+                end
+                    DIG : begin next_state = ground?DIG:GROUND; counter = 'd0; end
+                    SPLATTER : begin next_state=areset?LEFT:SPLATTER; counter = 'd0; end    
+                default : next_state<=LEFT;
+            endcase
+    end
+
+    // Output logic
+    assign walk_left = (state == LEFT);
+    assign walk_right = (state == RIGHT);
+    assign aaah = (state == GROUND);
+    assign digging = (state == DIG);
+
+
+endmodule
