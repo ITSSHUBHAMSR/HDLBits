@@ -1,0 +1,32 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output [23:0] out_bytes,
+    output done); //
+    
+    parameter BYTE1=0,BYTE2=1,BYTE3=2,DONE=3;
+    reg [1:0] state, next_state;
+
+    // State transition logic (combinational)
+    always@(*)begin
+        state=next_state;
+    end
+
+    // State flip-flops (sequential)
+    always@(posedge clk)begin
+        if(reset)
+            next_state=BYTE1;
+        else
+            case(state)
+                BYTE1 : begin next_state=in[3]?BYTE2:BYTE1; out_bytes[23:16]=in; end
+                BYTE2 : begin next_state=BYTE3; out_bytes[15:8]=in; end
+                BYTE3 : begin next_state=DONE; out_bytes[7:0]=in; end
+                DONE  : begin next_state=in[3]?BYTE2:BYTE1; out_bytes[23:16]=in; end
+                default : next_state=BYTE1;
+            endcase
+    end
+    // Output logic
+    assign done=(state==DONE);
+
+endmodule
