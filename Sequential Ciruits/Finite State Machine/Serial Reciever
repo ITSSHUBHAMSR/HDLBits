@@ -1,0 +1,36 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output done
+); 
+    parameter IDLE=0, START=1, DATA=3, STOP=4, WAIT=5;
+    reg [2:0] state, next_state;
+    reg [3:0] count;
+    
+    always@(*)begin
+        state=next_state;
+    end
+    
+    always@(posedge clk)begin
+        if(reset)
+            begin
+            next_state=IDLE;
+            count=0;
+            end
+        else
+            case(state)
+                IDLE   : begin next_state=in?IDLE:START; count=0; end
+                START  : begin next_state=DATA; count=0; end
+                DATA   : begin
+                         count=count+1;
+                         next_state=((count=='d8)&&(in))?STOP:(count<8?DATA:WAIT);
+                         end
+                STOP   : next_state=in?IDLE:START;
+                WAIT   : next_state=in?IDLE:WAIT;
+             endcase
+         end
+                    
+    assign done=(state==STOP);
+    
+endmodule
