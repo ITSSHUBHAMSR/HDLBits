@@ -1,0 +1,43 @@
+module top_module(
+    input clk,
+    input reset,    // Synchronous reset
+    input in,
+    output disc,
+    output flag,
+    output err);
+    
+    reg [2:0] state,next_state;
+    parameter IDLE=0, FIVE_ONE=1, SIX_ONE=2, SEVEN_ONE=3, DISCARD=4, FLAG=5, ERR=6;
+    reg [3:0]count;
+    
+    always@(*)begin
+        state=next_state;
+    end
+    
+    always@(posedge clk)begin
+        if(reset)begin
+            next_state=IDLE;
+            count=0;
+        end
+        else
+            case(state)
+                IDLE : begin next_state=in?FIVE_ONE:IDLE; count=0; end
+            FIVE_ONE : begin
+                       count=count+1;
+                       next_state=((in)&&(count<'d4))?FIVE_ONE:((in==1) && (count=='d4))?SIX_ONE:IDLE;
+                       end
+             SIX_ONE : begin next_state=in?SEVEN_ONE:DISCARD; count='d0; end
+             DISCARD : next_state=in?FIVE_ONE:IDLE;
+            SEVEN_ONE: next_state=in?ERR:FLAG; 
+                FLAG : next_state=in?FIVE_ONE:IDLE; 
+                 ERR : next_state=in?ERR:IDLE;
+                default : next_state=IDLE;
+            endcase
+    end
+    
+    assign disc=(state==DISCARD);
+    assign flag=(state==FLAG);
+    assign err=(state==ERR);
+    
+
+endmodule
