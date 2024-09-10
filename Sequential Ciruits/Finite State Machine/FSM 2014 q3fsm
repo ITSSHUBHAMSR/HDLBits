@@ -1,0 +1,44 @@
+module top_module (
+    input clk,
+    input reset,   // Synchronous reset
+    input s,
+    input w,
+    output z
+);
+    reg state,next_state;
+    parameter A=0, B=1;
+    reg [1:0]count_clock;
+    reg [1:0]one_count;
+    
+    always@(*)begin
+        state=next_state;
+    end
+    
+    always@(posedge clk)begin
+        if(reset)
+            begin
+                next_state=A;
+                count_clock=0;
+                one_count=0;
+                z=0;
+            end
+        else
+            case(state)
+                A : begin 
+                    count_clock=0;
+                    one_count=0;
+                    next_state=s?B:A;
+                    z=0;
+                    end
+                B : begin
+                    count_clock=count_clock+1;
+                    if(w==1) one_count=one_count+1;
+                    z=((count_clock==3)&&(one_count=='d2))?1:0;
+                    next_state=reset?A:B;
+                    one_count=(count_clock=='d3)?0:one_count;
+                    count_clock=(count_clock=='d3)?0:count_clock;
+                    end
+            endcase
+    end
+
+endmodule
