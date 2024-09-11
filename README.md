@@ -1,2 +1,2 @@
 # HDLBits
-This repository consist of solution of HDLBits.
+This repository consists of solutions of HDLBits.
