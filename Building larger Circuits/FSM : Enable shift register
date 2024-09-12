@@ -1,0 +1,30 @@
+module top_module (
+    input clk,
+    input reset,      // Synchronous reset
+    output shift_ena);
+    
+    parameter A=0, B=1, C=2;
+    reg [1:0]state,next_state;
+    reg [2:0] count;
+    
+    always@(posedge clk)begin 
+        if(reset) begin next_state=A; count='d0; shift_ena=1; end
+        else
+            case(next_state)
+                A : begin 
+                    next_state=B;
+                    shift_ena=1;
+                end
+                B : begin
+                    count=count+1;
+                    shift_ena=(count<'d3)?1:0;
+                    next_state=(count<'d3)?B:C;
+                end
+                C : begin
+                    shift_ena=0;
+                    next_state=C;
+                end
+            endcase
+    end
+                    
+endmodule
