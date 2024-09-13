@@ -1,0 +1,49 @@
+module top_module (
+    input clk,
+    input reset,      // Synchronous reset
+    input data,
+    output shift_ena,
+    output counting,
+    input done_counting,
+    output done,
+    input ack );
+    
+    parameter S0=0,S1=1,S2=2,S3=3,S4=4,S5=5,S6=6;
+    reg [2:0]state,next_state;
+    reg [2:0]count;
+    
+    always@(*)begin
+        state=next_state;
+    end
+    
+    always@(posedge clk)begin
+        if(reset)
+            begin
+                next_state=S0;
+                count='d0;
+              //  shift_ena='d0;
+            end
+        else
+            case(state)
+                S0 : next_state=data?S1:S0;
+                S1 : next_state=data?S2:S0;
+                S2 : next_state=data?S2:S3;
+                S3 : next_state=data?S4:S0;
+                S4 : begin 
+                     count=count+1;
+                     next_state=(count<'d4)?S4:S5;
+                     end
+                S5 : begin 
+                     next_state=done_counting?S6:S5; 
+                     count=0;
+                     end
+                S6 : next_state=ack?S0:S6;
+           default : next_state=S0;
+            endcase
+    end
+    
+    assign counting=(state==S5);
+    assign done=(state==S6);
+    assign shift_ena=(state==S4);
+
+endmodule
