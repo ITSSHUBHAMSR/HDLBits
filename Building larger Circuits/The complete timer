@@ -1,0 +1,78 @@
+module top_module (
+    input clk,
+    input reset,      // Synchronous reset
+    input data,
+    output [3:0] count,
+    output counting,
+    output done,
+    input ack );
+    
+    parameter S0=0,S1=1,S2=2,S3=3,S4=4,S5=5,S6=6;
+    reg [2:0]state,next_state;
+    reg [2:0]count1;
+    reg [511:0]wait_cycle;
+    reg [511:0]current_wait_cycle;
+    reg [3:0]delay;
+    reg [511:0] down_count;
+    reg [3:0]i;
+    
+    wire shift_ena;
+    
+    always@(*)begin
+        state=next_state;
+    end
+    
+    always@(posedge clk)begin
+        if(reset)
+            begin
+                next_state=S0;
+                count1='d0;
+                wait_cycle='d0;
+                current_wait_cycle='d0;
+                delay=0;
+            end
+        else
+            case(state)
+                S0 : begin 
+                     next_state=data?S1:S0;
+                     count1='d0;
+                     wait_cycle='d0;
+                     current_wait_cycle='d0;
+                     count='d0;
+                     delay=0;
+                     down_count='d1000;
+                     i=1;
+                     end
+                S1 : next_state=data?S2:S0;
+                S2 : next_state=data?S2:S3;
+                S3 : next_state=data?S4:S0;
+                S4 : begin 
+                     count1=count1+1;
+                     delay[4-count1]=data;
+                     next_state=(count1<'d4)?S4:S5;
+                     wait_cycle=(count1=='d4)?((delay+1)*1000):0;
+                     count=(count1=='d4)?delay:count;
+                     end
+                S5 : begin
+                     current_wait_cycle=current_wait_cycle+1;
+                     if(current_wait_cycle==(wait_cycle)) next_state=S6;
+                     else next_state=S5; 
+                    if(current_wait_cycle==down_count*i)begin
+                        i=i+1;
+                        count=count-1;
+                    end
+                        else begin 
+                            i=i;
+                        count=count;
+                        end
+                     end
+                S6 : begin count=0; next_state=ack?S0:S6;     end
+            endcase
+    end
+    
+    assign shift_ena=(state==S4);
+    assign counting=(state==S5);
+    assign done=(state==S6);
+                
+
+endmodule
