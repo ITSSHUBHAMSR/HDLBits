@@ -1,0 +1,14 @@
+module top_module();
+    reg [1:0]in;
+    wire out;
+    
+    andgate U0(in,out);
+    
+    initial begin
+     in='d0;
+ #10 in='d1;
+ #10 in='d2;
+ #10 in='d3;  
+    end
+
+endmodule
