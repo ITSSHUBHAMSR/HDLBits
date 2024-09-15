@@ -1,0 +1,17 @@
+module top_module ();
+    
+    reg clk,reset,t;
+    wire q;
+    
+    tff U0(clk,reset,t,q);
+    
+    initial begin
+       clk=0;
+       reset=1;
+       #6 reset=0;
+        t=1;
+    end
+
+    always #5 clk=~clk;
+    
+endmodule
