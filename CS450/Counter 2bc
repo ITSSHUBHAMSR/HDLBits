@@ -1,1 +1,18 @@
-
+module top_module(
+    input clk,
+    input areset,
+    input train_valid,
+    input train_taken,
+    output [1:0] state
+);
+    always@(posedge clk or posedge areset)begin
+        if(areset) state=2'b01;
+        else if((train_valid == 1) && (train_taken == 1) && (state=='d3)) state=state;
+        else if((train_valid == 1) && (train_taken == 1) ) state=state+1;
+        else if((train_valid == 1) && (train_taken == 0) && (state=='d0)) state=state;
+        else if((train_valid == 1) && (train_taken == 0)) state=state-1;
+        else if(train_valid==0) state=state;
+        else state=state;
+    end
+        
+endmodule
